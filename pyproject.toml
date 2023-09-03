@@ -20,7 +20,8 @@ dependencies = [
   "numpy",
   "ocrmypdf",
   "openai",
-  "pypdf>=3.15.4"
+  "pypdf>=3.15.4",
+  "rich"
 ]
 description = "Doclean"
 name = "doclean"
