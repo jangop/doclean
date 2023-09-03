@@ -1,0 +1,49 @@
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = ["setuptools>=61.0"]
+
+[project]
+authors = [
+  {email = "jgoepfert@techfak.uni-bielefeld.de", name = "Jan Philip Göpfert"}
+]
+classifiers = [
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3"
+]
+dependencies = [
+  "Pillow",
+  "click",
+  "dateparser",
+  "img2pdf",
+  "loguru",
+  "natsort",
+  "numpy",
+  "ocrmypdf",
+  "openai",
+  "pypdf>=3.15.4"
+]
+description = "Doclean"
+name = "doclean"
+readme = "README.md"
+requires-python = ">=3.11"
+version = "0.1.0"
+
+[project.optional-dependencies]
+dev = [
+  "pip-tools>=6.12.2",
+  "pre-commit>=2.20.0",
+  "pytest-cov>=4.0.0",
+  "pytest>=7.2.0"
+]
+
+[project.scripts]
+doclean = "doclean.cli:enter_image_whitening"
+docomp = "docleanc.li:enter_image_whitening"
+doconv = "doclean.cli:enter_image2pdf_conversion"
+
+[project.urls]
+"Bug Tracker" = "https://github.com/jangop/doclean/issues"
+"Homepage" = "https://github.com/jangop/doclean"
+
+[tool.pytest.ini_options]
+addopts = "-ra --durations=10 --cov=src --cov-report=term-missing --cov-report=html --cov-report=xml --cov-fail-under=50"
