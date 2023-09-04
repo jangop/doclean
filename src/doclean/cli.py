@@ -1,8 +1,11 @@
 from pathlib import Path
 
 import click
+from loguru import logger
 
 from . import adjust_levels, compress_images_in_pdf, convert
+
+logger.enable("doclean")
 
 
 @click.command()

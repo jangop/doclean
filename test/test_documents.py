@@ -17,17 +17,6 @@ def _generate_image(width: int, height: int) -> PIL.Image:
     # Prepare canvas.
     canvas = PIL.ImageDraw.Draw(image)
 
-    # # Generate a few random, very dark spots.
-    # n_spots = generator.integers(1, 10)
-    # for _ in range(n_spots):
-    #     x = generator.integers(0, width)
-    #     y = generator.integers(0, height)
-    #     radius = generator.integers(1, 10)
-    #     color = generator.integers(0, 10, size=3, dtype=np.uint8)
-    #     canvas.ellipse(
-    #         (x - radius, y - radius, x + radius, y + radius), fill=tuple(color)
-    #     )
-
     # Write some text in the middle.
     canvas.text((width // 2, height // 2), "Hello, world!", fill=(0, 0, 0))
 
