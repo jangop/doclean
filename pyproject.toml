@@ -39,7 +39,7 @@ dev = [
 
 [project.scripts]
 doclean = "doclean.cli:enter_image_whitening"
-docomp = "doclean.cli:enter_image_whitening"
+docomp = "doclean.cli:enter_image_compression_in_pdf"
 doconv = "doclean.cli:enter_image2pdf_conversion"
 
 [project.urls]
