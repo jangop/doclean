@@ -57,6 +57,7 @@ def optimize_pack_ocr_save(
     language: str = "deu",
     deskew: bool = True,
     output_type: Literal["pdf"] = "pdf",
+    rename: bool = False,
 ):
     """Process image files and embed in a PDF."""
     if input_dir_path.is_file():
@@ -156,25 +157,28 @@ def optimize_pack_ocr_save(
             final_date = None
             for found_date in found_dates:
                 logger.debug(f"Found date: {found_date}")
-                if found_date[1].date() < today:
-                    logger.debug(f"{found_date} ealier than today")
-                    final_date = found_date
+                # It appears we need to reparse the date because dataparser
+                # assumes MM.DD.YYYY, which makes no sense.
+                parsed_date = datetime.datetime.strptime(
+                    found_date[0], "%d.%m.%Y"
+                ).date()
+                if parsed_date < today:
+                    logger.debug(f"{parsed_date} ealier than today")
+                    final_date = parsed_date
                 else:
-                    logger.debug(f"{found_date} later than today")
+                    logger.debug(f"{parsed_date} later than today")
                     break
             if final_date:
                 logger.debug(f"Final date: {final_date}")
-                final_date = final_date[1].date()
+                final_date = final_date
                 # Rename the PDF file to include the date.
-                rename = False
                 if rename:
-                    pdf_file_path.rename(
-                        pdf_file_path.with_name(
-                            f"{pdf_file_path.stem}_"
-                            f"{final_date}"
-                            f"{pdf_file_path.suffix}"
-                        )
+                    new_path = pdf_file_path.with_name(
+                        f"{final_date.strftime('%Y-%m-%d')} {pdf_file_path.name}"
                     )
+                    logger.debug(f"Renaming PDF to `{new_path}`")
+                    pdf_file_path.rename(new_path)
+                    pdf_file_path = new_path
 
         assert pdf_file_path.exists()
         logger.debug(f"Final PDF saved to {pdf_file_path}.")

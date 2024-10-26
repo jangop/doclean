@@ -90,14 +90,28 @@ def enter_image_compression_in_pdf(input_path, output_path, scale_factor, qualit
     help="Enable/disable automatic page deskewing.",
     show_default=True,
 )
-def enter_image2pdf_conversion(input_dir_path, pdf_file_path, lang, deskew):
+@click.option(
+    "--rename/--no-rename",
+    default=False,
+    help="Automatically rename the output PDF with the detected date.",
+    show_default=True,
+)
+def enter_image2pdf_conversion(input_dir_path, pdf_file_path, lang, deskew, rename):
     """Convert images to a searchable PDF.
 
     This command processes either a directory of images or a PDF file, cleaning the
     images and combining them into a single searchable PDF with OCR text recognition.
+    If --rename is specified and a date is found in the first page, the output file
+    will be renamed to include that date.
 
     \b
     INPUT_DIR_PATH: Directory containing image files or a PDF file
     PDF_FILE_PATH: Path where the final PDF will be saved
     """
-    optimize_pack_ocr_save(input_dir_path, pdf_file_path, language=lang, deskew=deskew)
+    optimize_pack_ocr_save(
+        input_dir_path,
+        pdf_file_path,
+        language=lang,
+        deskew=deskew,
+        rename=rename,
+    )
