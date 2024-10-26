@@ -1,12 +1,12 @@
 from loguru import logger
 
 from ._compression import compress_images_in_pdf
-from ._convert import convert
-from ._whiten import adjust_levels
+from ._convert import optimize_pack_ocr_save
+from ._whiten import load_adjust_save
 
 __all__ = [
-    "adjust_levels",
-    "convert",
+    "load_adjust_save",
+    "optimize_pack_ocr_save",
     "compress_images_in_pdf",
 ]
 

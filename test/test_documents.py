@@ -3,8 +3,8 @@ import PIL.Image
 import PIL.ImageDraw
 
 from doclean._compression import compress_images_in_pdf
-from doclean._convert import convert
-from doclean._whiten import adjust_levels
+from doclean._convert import optimize_pack_ocr_save
+from doclean._whiten import load_adjust_save
 
 generator = np.random.default_rng(0)
 
@@ -30,7 +30,7 @@ def test_whitening(tmp_path):
     image = _generate_image(2480, 3508)
     image.save(input_path)
 
-    adjust_levels(input_path, output_path)
+    load_adjust_save(input_path, output_path)
 
     assert output_path.exists()
 
@@ -45,7 +45,7 @@ def test_conversion(tmp_path):
         image = _generate_image(2480, 3508)
         image.save(input_dir_path / f"image{i_image}.png")
 
-    convert(input_dir_path, pdf_file_path)
+    optimize_pack_ocr_save(input_dir_path, pdf_file_path)
 
     assert pdf_file_path.exists()
 

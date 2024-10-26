@@ -1,9 +1,11 @@
+from pathlib import Path
+
 import numpy as np
 from loguru import logger
 from PIL import Image
 
 
-def adjust_levels(input_path, output_path):
+def load_adjust_save(input_path: Path, output_path: Path):
     # Load the input image
     image = Image.open(input_path)
 
@@ -11,6 +13,17 @@ def adjust_levels(input_path, output_path):
         logger.critical(f"Cannot load image from `{input_path}`")
         raise RuntimeError("Could not load a required image")
 
+    # Adjust levels
+    adjusted_image = adjust_levels(image)
+
+    # Save the processed image
+    adjusted_image.save(output_path)
+    logger.debug("Image processing complete")
+
+    logger.debug(f"Adjusted image saved to `{output_path}`")
+
+
+def adjust_levels(image: Image.Image) -> Image.Image:
     # Convert the image to grayscale
     gray_image = image.convert("L")
     pixel_values = np.array(gray_image)
@@ -25,6 +38,9 @@ def adjust_levels(input_path, output_path):
     # Find the threshold where CDF transitions from background to foreground
     lower_threshold = np.where(cdf_normalized > 0.01)[0][0]
     upper_threshold = np.where(cdf_normalized > 0.08)[0][0]
+    logger.debug(
+        f"Lower threshold: `{lower_threshold}`; upper threshold: `{upper_threshold}`"
+    )
 
     # Clamp and rescale pixel values
     adjusted_pixel_values = np.clip(pixel_values, lower_threshold, upper_threshold)
@@ -37,10 +53,4 @@ def adjust_levels(input_path, output_path):
     )
     adjusted_image = Image.fromarray(scaled_pixel_values.astype(np.uint8))
 
-    # Save the processed image
-    adjusted_image.save(output_path)
-    logger.debug("Image processing complete")
-    logger.debug(
-        f"Lower threshold: {lower_threshold}; upper threshold: {upper_threshold}"
-    )
-    logger.debug(f"Adjusted image saved to `{output_path}`")
+    return adjusted_image

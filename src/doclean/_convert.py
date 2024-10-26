@@ -4,6 +4,7 @@ import subprocess
 import tempfile
 from contextlib import redirect_stderr
 from pathlib import Path
+from typing import Literal
 
 import dateparser.search
 import img2pdf
@@ -11,8 +12,8 @@ import ocrmypdf
 from loguru import logger
 from natsort import natsorted
 
-from ._compression import compress_images_in_pdf
-from ._whiten import adjust_levels
+from ._compression import compress_images_in_pdf, extract_images_from_pdf
+from ._whiten import load_adjust_save
 
 
 def _convert_image(image_path: Path, output_path: Path):
@@ -22,10 +23,10 @@ def _convert_image(image_path: Path, output_path: Path):
         # Create a temporary directory for the intermediate files.
         temp_dir = Path(temp_dir)
 
-        # Use `doclean`.
+        # Clean/whiten the image.
         cleaned_image_path = (temp_dir / "cleaned").with_suffix(".png")
         logger.debug(f"Cleaning {image_path}...")
-        adjust_levels(image_path, cleaned_image_path)
+        load_adjust_save(image_path, cleaned_image_path)
         assert cleaned_image_path.exists()
         logger.debug(f"Cleaned image saved to {cleaned_image_path}.")
 
@@ -49,12 +50,23 @@ def _convert_image(image_path: Path, output_path: Path):
         unpapered_image_path.rename(output_path)
 
 
-def convert(
-    input_dir_path,
-    pdf_file_path,
-    acceptable_extensions=(".png", ".jpg", ".jpeg", ".tiff", ".tif"),
+def optimize_pack_ocr_save(
+    input_dir_path: Path,
+    pdf_file_path: Path,
+    acceptable_extensions: tuple[str, ...] = (".png", ".jpg", ".jpeg", ".tiff", ".tif"),
+    language: str = "deu",
+    deskew: bool = True,
+    output_type: Literal["pdf"] = "pdf",
 ):
     """Process image files and embed in a PDF."""
+    if input_dir_path.is_file():
+        temporary_image_directory = Path(tempfile.TemporaryDirectory().name)
+        logger.debug(
+            f"Extracting images from `{input_dir_path}` "
+            f"into `{temporary_image_directory}`..."
+        )
+        extract_images_from_pdf(input_dir_path, temporary_image_directory)
+        input_dir_path = temporary_image_directory
 
     # Collect images files according to the acceptable extensions.
     single_input_image_paths = natsorted(
@@ -93,9 +105,9 @@ def convert(
             ocrmypdf.ocr(
                 intermediate_path,
                 pdf_file_path,
-                language="deu",
-                deskew=True,
-                output_type="pdf",
+                language=language,
+                deskew=deskew,
+                output_type=output_type,
                 jbig2_lossy=True,
                 optimize=3,
                 png_quality=1,
